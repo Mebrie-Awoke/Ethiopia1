@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   SafeAreaView,
   View,
@@ -12,11 +12,14 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { PROFILE_MENU, IMAGES } from "@/assets/asset";
 import { useFavorites } from "@/context/FavoritesContext";
+import { fetchCategories } from "@/utils/api";
 
 export default function Explore() {
   const router = useRouter();
   const [selectedChip, setSelectedChip] = useState("All");
   const { toggleFavorite, isFavorite } = useFavorites();
+  const [backendCategories, setBackendCategories] = useState([]);
+  const [backendStatus, setBackendStatus] = useState("Checking connection...");
 
   // Chips list matching Screen 2
   const categoryChips = ["All", "Culture", "History", "Traditions", "Beliefs"];
@@ -83,6 +86,43 @@ export default function Explore() {
     }))
   );
 
+  useEffect(() => {
+    let isActive = true;
+
+    fetchCategories()
+      .then((categories) => {
+        if (!isActive) return;
+        setBackendCategories(categories);
+        setBackendStatus("Backend connected");
+      })
+      .catch((error) => {
+        if (!isActive) return;
+        console.error("Backend categories load failed:", error);
+        setBackendStatus("Backend offline");
+      });
+
+    return () => {
+      isActive = false;
+    };
+  }, []);
+
+  const categoryImageMap = {
+    Culture: IMAGES.timket,
+    History: IMAGES.aksum,
+    Traditions: IMAGES.habesha,
+    Beliefs: IMAGES.orthodox,
+  };
+
+  const categoriesToDisplay = backendCategories.length
+    ? backendCategories.map((category) => ({
+        id: category.id,
+        title: category.name,
+        count: "Explore",
+        img: categoryImageMap[category.name] ?? IMAGES.aksum,
+        targetSection: category.description,
+      }))
+    : exploreCategories;
+
   // FILTER LOGIC FOR MAIN SCREEN ITEMS BASED ON ACTIVE CHIP
   const matchesChip = (itemCategory) => {
     if (selectedChip === "All") return true;
@@ -114,6 +154,9 @@ export default function Explore() {
         
         {/* 1. HORIZONTAL CATEGORY FILTER CHIPS */}
         <View className="py-4 pt-2">
+          <View className="px-4 mb-2">
+            <Text className="text-sm text-gray-500">{backendStatus}</Text>
+          </View>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
