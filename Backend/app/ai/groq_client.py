@@ -1,9 +1,12 @@
 from app.core.config import get_settings
 
 try:
-    from groq import GroqClient
+    from groq import Groq as GroqClient
 except ImportError:  # pragma: no cover
-    GroqClient = None
+    try:
+        from groq import Client as GroqClient
+    except ImportError:  # pragma: no cover
+        GroqClient = None
 
 
 class GroqClientWrapper:
@@ -13,12 +16,12 @@ class GroqClientWrapper:
         self.client = GroqClient(api_key=api_key)
 
     def generate(self, prompt: str) -> str:
-        response = self.client.responses.create(
+        response = self.client.chat.completions.create(
             model="llama-3.3-70b-versatile",
-            input=prompt,
+            messages=[{"role": "user", "content": prompt}],
         )
-        if hasattr(response, "output") and response.output:
-            first_output = response.output[0]
-            if hasattr(first_output, "content") and first_output.content:
-                return str(first_output.content[0].text or "").strip()
+        if getattr(response, "choices", None):
+            first_choice = response.choices[0]
+            if hasattr(first_choice, "message") and getattr(first_choice.message, "content", None):
+                return str(first_choice.message.content).strip()
         return str(response)

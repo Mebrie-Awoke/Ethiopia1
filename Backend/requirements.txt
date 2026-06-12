@@ -4,6 +4,7 @@ sqlalchemy>=2.0.20
 aiosqlite>=0.18.0
 alembic>=1.11.0
 pydantic>=2.5.0
+pydantic-settings>=2.14.1
 python-dotenv>=1.0.0
 groq>=0.4.0
 pytest>=8.0.0

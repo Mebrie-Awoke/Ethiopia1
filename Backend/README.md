@@ -68,6 +68,6 @@ uvicorn app.main:app --reload
 
 ## Notes
 
-- The local document retriever loads mock Markdown files from `app/mock_data/`.
+- The local document retriever loads Markdown files from `app/Documents/`.
 - The chatbot uses Groq along with local Ethiopia knowledge context.
 - API docs are available at `/docs` after starting the server.

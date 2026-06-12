@@ -109,7 +109,7 @@ async def seed_sample_content() -> None:
 @app.on_event("startup")
 async def startup_event() -> None:
     app.state.document_retriever = DocumentRetriever(
-        base_path=Path(__file__).resolve().parent / "mock_data"
+        base_path=Path(__file__).resolve().parent / "Documents"
     )
     app.state.document_retriever.load_documents()
     app.state.ai_service = EthiopiaAIChatService(

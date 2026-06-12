@@ -13,7 +13,7 @@ The repository includes:
   - `app/main.py`: FastAPI entrypoint and startup logic.
   - `app/routers/`: API route definitions for health, categories, articles, and chat.
   - `app/schemas/`, `app/models/`, `app/services/`, `app/repositories/`: app layer structure.
-  - `app/mock_data/`: local Ethiopia knowledge documents used by the chat feature.
+  - `app/Documents/`: local Ethiopia knowledge documents used by the chat feature.
   - `tests/`: backend test suite.
 - `Frontend/`
   - `app/`: Expo router pages for explore, chat, favorites, and settings.
