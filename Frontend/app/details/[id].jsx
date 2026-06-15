@@ -8,7 +8,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { useFavorites } from "@/context/FavoritesContext";
 import { useRouter } from "expo-router";
 import * as Speech from "expo-speech";
-import { fetchArticleById, fetchArticleBySlug } from "@/utils/api";
 
 const { width, height } = Dimensions.get("window");
 
@@ -16,54 +15,15 @@ export default function DetailsPage() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
   const { toggleFavorite, isFavorite } = useFavorites();
-  const [backendArticle, setBackendArticle] = useState(null);
-  const [backendError, setBackendError] = useState(null);
 
   const localItem = PROFILE_MENU
     .flatMap((section) => section.data)
     .find((product) => product.id === id);
 
-  useEffect(() => {
-    let active = true;
+  const displayedItem = localItem;
 
-    const loadBackendArticle = async () => {
-      try {
-        let article = null;
-        if (/^\d+$/.test(id)) {
-          article = await fetchArticleById(Number(id));
-        } else {
-          article = await fetchArticleBySlug(id);
-        }
-
-        if (!active || !article) return;
-        setBackendArticle(article);
-      } catch (error) {
-        if (!active) return;
-        console.error("Failed to load backend article:", error);
-        setBackendError(error.message);
-      }
-    };
-
-    loadBackendArticle();
-    return () => {
-      active = false;
-    };
-  }, [id]);
-
-  const displayedItem = backendArticle
-    ? {
-        ...backendArticle,
-        name: backendArticle.title,
-        description: backendArticle.content,
-        icon: backendArticle.image_url ? { uri: backendArticle.image_url } : localItem?.icon || IMAGES.aksum,
-        categoryLabel: localItem?.categoryLabel || "Ethiopia",
-        readTime: "8 min read",
-        likes: "1.2k",
-        highlights: [],
-      }
-    : localItem;
-
-  const isFav = displayedItem ? isFavorite(displayedItem) : false;
+  const item = displayedItem;
+  const isFav = item ? isFavorite(item) : false;
 
   // Font size adjustment state
   const [fontSize, setFontSize] = useState(15);
