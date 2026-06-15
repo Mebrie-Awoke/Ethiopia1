@@ -17,6 +17,7 @@ import { useRouter } from "expo-router";
 import { PROFILE_MENU } from "@/assets/asset";
 import { StatusBar } from "expo-status-bar";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { API_BASE_URL } from "@/utils/api";
 
 const CHAT_STORAGE_KEY = "@ethioguide_chat_history";
 
@@ -148,26 +149,65 @@ export default function AIChatScreen() {
       };
 
       setTimeout(() => {
-        if (apiKey) {
-          fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                contents: [{ parts: [{ text: `You are an AI guide for ethioGuide, specializing in Ethiopian culture, history, traditions, and beliefs. Answer concisely in 2‑3 sentences. Question: ${text}` }] }],
-              }),
+        const backendUrl = `${API_BASE_URL}/get`;
+        fetch(backendUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ msg: text }),
+        })
+          .then((r) => r.json())
+          .then((data) => {
+            const backendText = data?.answer;
+            if (backendText) {
+              appendAI(backendText, localReply.relatedIds);
+              return;
             }
-          )
-            .then((r) => r.json())
-            .then((data) => {
-              const apiText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-              appendAI(apiText || localReply.text, localReply.relatedIds);
-            })
-            .catch(() => appendAI(localReply.text, localReply.relatedIds));
-        } else {
-          appendAI(localReply.text, localReply.relatedIds);
-        }
+
+            // Fallback to Gemini if available
+            if (apiKey) {
+              fetch(
+                `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    contents: [{ parts: [{ text: `You are an AI guide for ethioGuide, specializing in Ethiopian culture, history, traditions, and beliefs. Answer concisely in 2‑3 sentences. Question: ${text}` }] }],
+                  }),
+                }
+              )
+                .then((r) => r.json())
+                .then((gdata) => {
+                  const apiText = gdata?.candidates?.[0]?.content?.parts?.[0]?.text;
+                  appendAI(apiText || localReply.text, localReply.relatedIds);
+                })
+                .catch(() => appendAI(localReply.text, localReply.relatedIds));
+            } else {
+              appendAI(localReply.text, localReply.relatedIds);
+            }
+          })
+          .catch(() => {
+            // Backend unreachable — fallback to Gemini or local
+            if (apiKey) {
+              fetch(
+                `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    contents: [{ parts: [{ text: `You are an AI guide for ethioGuide, specializing in Ethiopian culture, history, traditions, and beliefs. Answer concisely in 2‑3 sentences. Question: ${text}` }] }],
+                  }),
+                }
+              )
+                .then((r) => r.json())
+                .then((gdata) => {
+                  const apiText = gdata?.candidates?.[0]?.content?.parts?.[0]?.text;
+                  appendAI(apiText || localReply.text, localReply.relatedIds);
+                })
+                .catch(() => appendAI(localReply.text, localReply.relatedIds));
+            } else {
+              appendAI(localReply.text, localReply.relatedIds);
+            }
+          });
       }, 1000);
     },
     [input]
