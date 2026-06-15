@@ -1,33 +1,31 @@
 # Ethioguide App
 
-Ethioguide App is a full-stack educational project for exploring Ethiopian culture, history, traditions, and local knowledge.
+Ethioguide App is a frontend-backend educational project for exploring Ethiopian culture, history, traditions, and a chat interface backed by local AI retrieval.
 
 The repository includes:
 
-- `Backend/`: FastAPI application with SQLite persistence, article/category APIs, and an AI-enabled chat feature.
-- `Frontend/`: Expo-based React Native application that consumes the backend API and displays Ethiopia knowledge content.
+- `Backend/`: FastAPI application exposing a chat-only API and a health endpoint.
+- `Frontend/`: Expo-based React Native application with local content for explore/details screens and a chat interface that calls the backend.
 
 ## Repository Structure
 
 - `Backend/`
-  - `app/main.py`: FastAPI entrypoint and startup logic.
-  - `app/routers/`: API route definitions for health, categories, articles, and chat.
-  - `app/schemas/`, `app/models/`, `app/services/`, `app/repositories/`: app layer structure.
-  - `app/Documents/`: local Ethiopia knowledge documents used by the chat feature.
-  - `tests/`: backend test suite.
+  - `app.py`: FastAPI entrypoint and chat API implementation.
+  - `requirements.txt`: Python dependencies for the backend.
+  - `data/`: backend document assets and Chroma DB storage.
 - `Frontend/`
   - `app/`: Expo router pages for explore, chat, favorites, and settings.
-  - `utils/api.js`: backend API client implementation.
+  - `utils/api.js`: backend API base URL for chat.
   - `package.json`: Expo dependencies and scripts.
 
 ## Features
 
-- Backend category and article REST API
-- Article search and article detail retrieval
-- Health endpoint for API status checks
-- AI chat support using a local document retriever and Groq integration
-- Expo mobile app UI for browsing Ethiopian knowledge
-- Cross-origin API support via CORS middleware
+- Backend exposes a simple chat API for the frontend:
+  - `POST /get` for chat queries
+  - `GET /health` for health checks
+- Frontend chat interface calls the backend directly
+- Explore and details screens are local-only and do not depend on backend data
+- CORS enabled in backend so the frontend can communicate safely
 
 ## Backend Setup
 
@@ -45,20 +43,13 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-4. Create environment variables.
-   - Copy the example env file if available or create `.env`.
-   - Set `GROQ_API_KEY` if you want to enable chat integration.
+4. Create a `.env` file in `Backend/` and set environment variables as needed.
+   - `GROQ_API_KEY` is required if the backend chat uses Groq model access.
 
-5. Run database migrations:
-
-```powershell
-alembic upgrade head
-```
-
-6. Start the backend:
+5. Start the backend:
 
 ```powershell
-uvicorn app.main:app --reload
+python app.py
 ```
 
 The backend will be available at `http://localhost:8000`.
@@ -78,31 +69,34 @@ npm install
 npm start
 ```
 
-4. If needed, set the backend API URL by exporting `EXPO_PUBLIC_API_URL` or by configuring environment variables for Expo.
-
-The front-end app will use `http://localhost:8000` by default.
+4. By default, the frontend uses `http://localhost:8000` for backend chat calls.
+   - If you run the backend on another host or device, set `EXPO_PUBLIC_API_URL`.
 
 ## API Endpoints
 
 - `GET /health`
-- `GET /categories/`
-- `GET /articles/`
-- `GET /articles/{id}`
-- `GET /articles/category/{id}`
-- `GET /articles/search?q=`
-- `POST /chat/message`
-- `GET /chat/knowledge/status`
+- `POST /get`
 
-## Running Backend Tests
+## Running the App
 
-From `Backend/` run:
+1. Start the backend:
 
 ```powershell
-pytest tests/test_articles.py -q
+cd Backend
+python app.py
 ```
+
+2. Start the frontend:
+
+```bash
+cd Frontend
+npm start
+```
+
+3. Open the Expo app on a simulator or device and navigate to the chat screen.
 
 ## Notes
 
-- The backend seeds sample content on startup when the database is empty.
-- The frontend fetch layer is defined in `Frontend/utils/api.js`.
-- To use the AI chat feature, provide a valid `GROQ_API_KEY` in the backend environment.
+- The frontend communicates with the backend only for chat messages.
+- Other app screens use local content and do not require backend data.
+- If the backend is unavailable, the chat interface falls back to local replies.
