@@ -11,7 +11,7 @@ import {
   Platform,
   ScrollView,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { PROFILE_MENU } from "@/assets/asset";
@@ -86,6 +86,8 @@ export default function AIChatScreen() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const flatListRef = useRef(null);
+  const insets = useSafeAreaInsets();
+  const TAB_BAR_HEIGHT = 64; // must match tabBarStyle.height in (tabs)/_layout.jsx
 
   // Load persisted chat history
   useEffect(() => {
@@ -342,7 +344,7 @@ export default function AIChatScreen() {
 
   return (
     <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
-      <SafeAreaView style={{ flex: 1, backgroundColor: "#032014" }} edges={["top"]}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: "#032014" }} edges={["top", "bottom"]}>
         <StatusBar style="light" />
         {/* Header */}
         <View
@@ -391,7 +393,7 @@ export default function AIChatScreen() {
           data={messages}
           keyExtractor={(item) => item.id}
           renderItem={renderMessage}
-          contentContainerStyle={{ paddingTop: 16, paddingBottom: 20 }}
+          contentContainerStyle={{ paddingTop: 16, paddingBottom: 20 + insets.bottom + TAB_BAR_HEIGHT + 12 }}
           showsVerticalScrollIndicator={false}
           ListFooterComponent={loading ? (
             <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 16, paddingBottom: 8, marginLeft: 40 }}>
@@ -402,57 +404,58 @@ export default function AIChatScreen() {
             </View>
           ) : null}
         />
-        {/* Input bar */}
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            paddingHorizontal: 12,
-            paddingVertical: 10,
-            borderTopWidth: 1,
-            borderTopColor: "rgba(11,51,36,0.3)",
-            backgroundColor: "#032014",
-          }}
-        >
+        {/* Input bar (absolute, above tab bar) */}
+        <View style={{ position: "absolute", left: 0, right: 0, bottom: insets.bottom + TAB_BAR_HEIGHT - 4, paddingHorizontal: 12, zIndex: 50, elevation: 50 }} pointerEvents="box-none">
           <View
             style={{
-              flex: 1,
               flexDirection: "row",
               alignItems: "center",
-              backgroundColor: "#0D2E20",
-              borderRadius: 24,
-              paddingHorizontal: 16,
+              borderTopWidth: 1,
+              borderTopColor: "rgba(11,51,36,0.3)",
+              backgroundColor: "#032014",
               paddingVertical: 10,
-              borderWidth: 1,
-              borderColor: "rgba(6,26,18,0.4)",
-              minHeight: 48,
             }}
           >
-            <TextInput
-              value={input}
-              onChangeText={setInput}
-              placeholder="Ask about Ethiopia..."
-              placeholderTextColor="#5A7D6E"
-              onSubmitEditing={() => sendMessage()}
-              returnKeyType="send"
-              style={{ flex: 1, color: "#fff", fontSize: 14 }}
-            />
-            <TouchableOpacity onPress={() => sendMessage("Tell me an interesting fact about Ethiopian history.")} style={{ padding: 4, marginLeft: 6 }}>
-              <Ionicons name="mic" size={20} color="#34D399" />
+            <View
+              style={{
+                flex: 1,
+                flexDirection: "row",
+                alignItems: "center",
+                backgroundColor: "#0D2E20",
+                borderRadius: 24,
+                paddingHorizontal: 16,
+                paddingVertical: 10,
+                borderWidth: 1,
+                borderColor: "rgba(6,26,18,0.4)",
+                minHeight: 48,
+              }}
+            >
+              <TextInput
+                value={input}
+                onChangeText={setInput}
+                placeholder="Ask about Ethiopia..."
+                placeholderTextColor="#5A7D6E"
+                onSubmitEditing={() => sendMessage()}
+                returnKeyType="send"
+                style={{ flex: 1, color: "#fff", fontSize: 14 }}
+              />
+              <TouchableOpacity onPress={() => sendMessage("Tell me an interesting fact about Ethiopian history.")} style={{ padding: 4, marginLeft: 6 }}>
+                <Ionicons name="mic" size={20} color="#34D399" />
+              </TouchableOpacity>
+            </View>
+            <TouchableOpacity onPress={() => sendMessage()} activeOpacity={0.8} style={{
+              width: 48,
+              height: 48,
+              borderRadius: 24,
+              backgroundColor: "#0B6B43",
+              alignItems: "center",
+              justifyContent: "center",
+              marginLeft: 10,
+              elevation: 4,
+            }}>
+              <Ionicons name="send" size={17} color="white" />
             </TouchableOpacity>
           </View>
-          <TouchableOpacity onPress={() => sendMessage()} activeOpacity={0.8} style={{
-            width: 48,
-            height: 48,
-            borderRadius: 24,
-            backgroundColor: "#0B6B43",
-            alignItems: "center",
-            justifyContent: "center",
-            marginLeft: 10,
-            elevation: 4,
-          }}>
-            <Ionicons name="send" size={17} color="white" />
-          </TouchableOpacity>
         </View>
       </SafeAreaView>
     </KeyboardAvoidingView>

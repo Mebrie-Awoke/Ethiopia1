@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   Switch,
   Modal,
-  TextInput,
   Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -61,7 +60,7 @@ export default function SettingsScreen() {
           if (prefs.largerText !== undefined) setLargerText(prefs.largerText);
           if (prefs.language) setLanguage(prefs.language);
           if (prefs.fontSize) setFontSize(prefs.fontSize);
-          if (prefs.profile) setProfile(prefs.profile);
+      
         }
       } catch (e) {
         console.error("Failed to load settings:", e);
@@ -81,28 +80,7 @@ export default function SettingsScreen() {
     }
   }, []);
 
-  // --- STATE FOR PROFILE ---
-  const [profile, setProfile] = useState({
-    name: "Megabi Getaneh",
-    email: "megabigech@gmail.com",
-  });
-  const [profileModalVisible, setProfileModalVisible] = useState(false);
-  const [editName, setEditName] = useState(profile.name);
-  const [editEmail, setEditEmail] = useState(profile.email);
-
-  const handleUpdateProfile = () => {
-    if (!editName.trim()) {
-      showToast("Name cannot be empty!");
-      return;
-    }
-    if (!editEmail.trim() || !editEmail.includes("@")) {
-      showToast("Please enter a valid email address!");
-      return;
-    }
-    setProfile({ name: editName, email: editEmail });
-    setProfileModalVisible(false);
-    showToast("Profile updated successfully!");
-  };
+  
 
   // --- STATE FOR APP PREFERENCES ---
   const [language, setLanguage] = useState("English");
@@ -175,12 +153,7 @@ export default function SettingsScreen() {
     showToast(`Updated to ${value}`);
   };
 
-  // --- LOGOUT MODAL STATE ---
-  const [logoutModalVisible, setLogoutModalVisible] = useState(false);
-  const handleLogout = () => {
-    setLogoutModalVisible(false);
-    showToast("Logged out successfully!");
-  };
+  
 
   // --- REUSABLE WIDGETS ---
   const SettingRow = ({ icon, label, value, onPress, isSwitch, switchValue, onSwitchChange, isDestructive }) => {
@@ -270,45 +243,7 @@ export default function SettingsScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 40 }}
       >
-        {/* --- PROFILE CARD --- */}
-        <View className="bg-white rounded-3xl p-5 mb-5 shadow-sm border border-gray-100">
-          <View className="flex-row items-center">
-            {/* Elegant Gradient Initial Circle */}
-            <View className="w-16 h-16 rounded-full bg-[#0B6B43] items-center justify-center shadow-md">
-              <Text className="text-white text-xl font-bold tracking-wider">
-                {profile.name
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")}
-              </Text>
-            </View>
-            <View className="ml-4 flex-1">
-              <Text className="text-gray-900 text-lg font-bold">
-                {profile.name}
-              </Text>
-              <Text className="text-gray-400 text-xs mt-0.5">
-                {profile.email}
-              </Text>
-              <View className="flex-row mt-2">
-                <View className="bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100">
-                  <Text className="text-[#0B6B43] text-[10px] font-semibold uppercase">
-                    EthioGuide Explorer
-                  </Text>
-                </View>
-              </View>
-            </View>
-            <TouchableOpacity
-              onPress={() => {
-                setEditName(profile.name);
-                setEditEmail(profile.email);
-                setProfileModalVisible(true);
-              }}
-              className="w-10 h-10 rounded-full bg-gray-50 border border-gray-100 items-center justify-center"
-            >
-              <Ionicons name="pencil" size={16} color="#0B6B43" />
-            </TouchableOpacity>
-          </View>
-        </View>
+        {/* Profile card removed per request */}
 
         {/* --- APP PREFERENCES SECTION --- */}
         <Text className="text-[12px] font-bold text-gray-400 uppercase tracking-widest pl-1 mb-2">
@@ -547,71 +482,13 @@ export default function SettingsScreen() {
           />
         </View>
 
-        {/* --- LOGOUT BUTTON --- */}
-        <View className="bg-white rounded-3xl px-4 py-1.5 mb-2 shadow-sm border border-red-50">
-          <SettingRow
-            icon="log-out-outline"
-            label="Log Out"
-            isDestructive={true}
-            onPress={() => setLogoutModalVisible(true)}
-          />
-        </View>
+        {/* Logout entry removed per request */}
       </ScrollView>
 
       {/* ========================================================
           MODAL: PROFILE EDIT DIALOG
          ======================================================== */}
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={profileModalVisible}
-        onRequestClose={() => setProfileModalVisible(false)}
-      >
-        <View className="flex-1 bg-black/60 justify-center items-center px-6">
-          <View className="bg-white rounded-3xl w-full p-6 shadow-2xl">
-            <Text className="text-gray-900 text-xl font-bold mb-4">Edit Profile</Text>
-
-            <Text className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-1 pl-1">
-              Full Name
-            </Text>
-            <TextInput
-              value={editName}
-              onChangeText={setEditName}
-              placeholder="Enter name"
-              className="bg-gray-50 rounded-xl px-4 py-3 text-gray-800 border border-gray-100 mb-4"
-              placeholderTextColor="#9CA3AF"
-            />
-
-            <Text className="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-1 pl-1">
-              Email Address
-            </Text>
-            <TextInput
-              value={editEmail}
-              onChangeText={setEditEmail}
-              placeholder="Enter email"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              className="bg-gray-50 rounded-xl px-4 py-3 text-gray-800 border border-gray-100 mb-6"
-              placeholderTextColor="#9CA3AF"
-            />
-
-            <View className="flex-row space-x-3">
-              <TouchableOpacity
-                onPress={() => setProfileModalVisible(false)}
-                className="flex-1 bg-gray-100 rounded-xl py-3 border border-gray-200 items-center justify-center mr-2"
-              >
-                <Text className="text-gray-600 font-semibold text-sm">Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={handleUpdateProfile}
-                className="flex-1 bg-[#0B6B43] rounded-xl py-3 items-center justify-center ml-2 shadow-sm"
-              >
-                <Text className="text-white font-semibold text-sm">Save Changes</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
+      {/* Profile edit modal removed */}
 
       {/* ========================================================
           MODAL: GENERAL OPTION SELECTOR
@@ -739,42 +616,7 @@ export default function SettingsScreen() {
         </View>
       </Modal>
 
-      {/* ========================================================
-          MODAL: LOGOUT CONFIRMATION
-         ======================================================== */}
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={logoutModalVisible}
-        onRequestClose={() => setLogoutModalVisible(false)}
-      >
-        <View className="flex-1 bg-black/60 justify-center items-center px-6">
-          <View className="bg-white rounded-3xl w-full p-6 shadow-2xl items-center text-center">
-            <View className="w-14 h-14 rounded-full bg-red-50 items-center justify-center mb-4 border border-red-100">
-              <Ionicons name="log-out" size={28} color="#DA121A" />
-            </View>
-            <Text className="text-gray-900 text-lg font-bold mb-2">Log Out of EthioGuide?</Text>
-            <Text className="text-gray-500 text-sm text-center mb-6 pl-2 pr-2">
-              You will be signed out of your account. You can sign back in anytime using your email address.
-            </Text>
-
-            <View className="flex-row space-x-3 w-full">
-              <TouchableOpacity
-                onPress={() => setLogoutModalVisible(false)}
-                className="flex-1 bg-gray-100 rounded-xl py-3 border border-gray-200 items-center justify-center mr-2"
-              >
-                <Text className="text-gray-600 font-semibold text-sm">Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={handleLogout}
-                className="flex-1 bg-[#DA121A] rounded-xl py-3 items-center justify-center ml-2 shadow-sm"
-              >
-                <Text className="text-white font-semibold text-sm">Log Out</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
+      {/* Logout modal removed */}
     </SafeAreaView>
   );
 }
