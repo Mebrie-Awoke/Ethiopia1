@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request  
-from fastapi.responses import JSONResponse 
+from fastapi.responses import JSONResponse  
 from fastapi.middleware.cors import CORSMiddleware
 from src.helper import download_hugging_face_embeddings
 from langchain_chroma import Chroma
