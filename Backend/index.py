@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 import os
-import shutil
+import shutil  
 import uuid    
 from src.helper import load_pdf_file, filter_to_minimal_docs, text_split, download_hugging_face_embeddings
 from langchain_chroma import Chroma
