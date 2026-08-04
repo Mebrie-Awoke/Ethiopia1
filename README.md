@@ -2,7 +2,7 @@
 Ethioguide App is a frontend-backend educational project for exploring Ethiopian culture, history, traditions, and a chat interface backed by local AI retrieval.
 
 The repository includes:
-
+ 
 - `Backend/`: FastAPI application exposing a chat-only API and a health endpoint.
 - `Frontend/`: Expo-based React Native application with local content for explore/details screens and a chat interface that calls the backend.
 
