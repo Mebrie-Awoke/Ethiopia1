@@ -1,4 +1,4 @@
-# Ethioguide   
+# Ethioguide
 Ethioguide App is a frontend-backend educational project for exploring Ethiopian culture, history, traditions, and a chat interface backed by local AI retrieval.
 
 The repository includes:     
